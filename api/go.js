@@ -1,35 +1,58 @@
+// GET /go/:slug -> looks up slug in Airtable, redirects to Affiliate Link.
+// Fire-and-forget increments "Click Count" and stamps "Last Clicked" (fields optional).
 const Airtable = require('airtable');
 
-module.exports = async (req, res) => {
-  const { slug } = req.query;
+const FALLBACK = process.env.FALLBACK_URL || 'https://bizboogie.com';
+const TABLE = process.env.AIRTABLE_TABLE || 'Affiliate Products';
 
-  if (!slug) {
-    res.writeHead(302, { Location: 'https://bizboogie.com' });
-    res.end();
-    return;
-  }
+function redirect(res, location) {
+  res.writeHead(302, { Location: location, 'Cache-Control': 'no-store' });
+  res.end();
+}
+
+module.exports = async (req, res) => {
+  const slug = (req.query && req.query.slug ? String(req.query.slug) : '').trim().toLowerCase();
+
+  if (!slug) return redirect(res, FALLBACK);
 
   const token = process.env.AIRTABLE_TOKEN;
   const baseId = process.env.AIRTABLE_BASE_ID;
-
-  if (!token || !baseId) {
-    res.writeHead(302, { Location: 'https://bizboogie.com?error=missing_vars' });
-    res.end();
-    return ;
-  }
+  if (!token || !baseId) return redirect(res, `${FALLBACK}?error=missing_env`);
 
   try {
     const base = new Airtable({ apiKey: token }).base(baseId);
-    const records = await base('Aff–Æ–FR&öGV7G2r’ç6VÆV7B‡°¢f–ÇFW$'”f÷&×VÆ¢µ6ÇVwÒÒrG·6ÇVwÒvÀ¢Ö…&V6÷&G3¢¢Ò’æf—'7EvR‚“° ¢–b‡&V6÷&G2bb&V6÷&G2æÆVæwF‚âbb&V6÷&G5³Òæf–VÆG5²tfiliate Link']) {
-      res.writeHead(302, { Location: records[0].fields+'Affiliate Link'] });
-      res.end();
-      return;
-    }
-  } catch (error) {
-    console.error("Airtable Error:", error);
-  }
+    // Airtable formula: case-insensitive exact match on Slug
+    const records = await base(TABLE)
+      .select({
+        maxRecords: 1,
+        filterByFormula: `LOWER({Slug})="${slug.replace(/"/g, '\\"')}"`,
+      })
+      .firstPage();
 
-  // Fallback
-  res.writeHead(302, { Location: 'https://bizboogie.com?error=not_found' });
-  res.end();
+    if (!records || records.length === 0) {
+      return redirect(res, '/not-found.html?slug=' + encodeURIComponent(slug));
+    }
+
+    const rec = records[0];
+    const link = rec.get('Affiliate Link');
+
+    // Fire-and-forget click tracking. Ignore if fields don't exist.
+    const current = Number(rec.get('Click Count') || 0);
+    base(TABLE)
+      .update(rec.id, {
+        'Click Count': current + 1,
+        'Last Clicked': new Date().toISOString(),
+      })
+      .catch((err) => {
+        if (err && err.error !== 'UNKNOWN_FIELD_NAME') {
+          console.error('Click tracking failed:', err.message || err);
+        }
+      });
+
+    if (!link) return redirect(res, '/not-found.html?slug=' + encodeURIComponent(slug) + '&reason=no_link');
+    return redirect(res, String(link));
+  } catch (error) {
+    console.error('Airtable error:', error && error.message ? error.message : error);
+    return redirect(res, `${FALLBACK}?error=lookup_failed`);
+  }
 };

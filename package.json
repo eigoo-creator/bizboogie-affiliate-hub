@@ -1,8 +1,13 @@
 {
   "name": "bizboogie-affiliate-hub",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
+  "scripts": {
+    "dev": "node dev-server.js"
+  },
   "dependencies": {
-    "airtable": "^0.12.2"
+    "airtable": "^0.12.2",
+    "dotenv": "^17.4.2",
+    "qrcode": "^1.5.3"
   }
 }

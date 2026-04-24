@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Signal Lost // Wayfinder's Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Unbounded:wght@700;900&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body{background:#05070d;color:#e2e8f0;font-family:'JetBrains Mono',monospace;}
+  .display{font-family:'Unbounded',sans-serif;letter-spacing:-.03em;}
+  .grid-bg{
+    background-image:linear-gradient(rgba(56,189,248,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.14) 1px,transparent 1px);
+    background-size:56px 56px;
+    mask-image:radial-gradient(ellipse 70% 60% at 50% 40%,#000 40%,transparent 80%);
+  }
+  .glitch{position:relative;display:inline-block;}
+  .glitch::before,.glitch::after{content:attr(data-text);position:absolute;inset:0;mix-blend-mode:screen;}
+  .glitch::before{color:#22d3ee;transform:translate(-3px,-2px);clip-path:inset(0 0 55% 0);animation:g1 2.4s infinite steps(2);}
+  .glitch::after{color:#a3e635;transform:translate(3px,2px);clip-path:inset(55% 0 0 0);animation:g2 2.4s infinite steps(2);}
+  @keyframes g1{50%{transform:translate(3px,-3px)}}
+  @keyframes g2{50%{transform:translate(-3px,3px)}}
+  .blink{animation:blink 1.2s steps(2) infinite;}
+  @keyframes blink{50%{opacity:0}}
+</style>
+</head>
+<body class="min-h-screen relative overflow-hidden flex items-center justify-center p-6">
+  <div class="absolute inset-0 grid-bg pointer-events-none"></div>
+
+  <main class="relative z-10 max-w-2xl text-center" data-testid="not-found-page">
+    <div class="text-xs uppercase tracking-[0.4em] text-cyan-300 mb-6">Error · Signal Lost</div>
+    <h1 class="display text-[clamp(4rem,15vw,10rem)] leading-none font-black">
+      <span class="glitch" data-text="404">404</span>
+    </h1>
+    <p class="display text-2xl md:text-3xl font-bold mt-4 text-slate-100">No slug matches that callsign.</p>
+    <p class="text-slate-400 mt-4 leading-relaxed" data-testid="not-found-detail">
+      The Wayfinder's Engine searched the base and came up empty<span id="slug-line"></span>.
+      Check the code on your link, or head back to the hub.
+    </p>
+
+    <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+      <a href="/" class="inline-flex items-center gap-2 rounded-full px-6 py-3 bg-gradient-to-b from-cyan-200 to-lime-300 text-slate-950 font-bold uppercase tracking-[0.2em] text-sm hover:brightness-110 transition" data-testid="back-home">
+        ← Return to Hub
+      </a>
+      <a href="https://bizboogie.com" class="inline-flex items-center gap-2 rounded-full px-6 py-3 border border-slate-700 hover:border-cyan-400 hover:bg-cyan-400/5 text-slate-200 text-sm uppercase tracking-[0.2em] transition" data-testid="go-main">
+        bizboogie.com
+      </a>
+    </div>
+
+    <div class="mt-12 text-[10px] uppercase tracking-[0.35em] text-slate-500 flex items-center justify-center gap-2">
+      <span class="w-1.5 h-1.5 rounded-full bg-amber-400 blink"></span>
+      node · 07 · recovery mode
+    </div>
+  </main>
+
+<script>
+  const p=new URLSearchParams(location.search);
+  const slug=p.get('slug');
+  if(slug){document.getElementById('slug-line').textContent=' for "'+slug+'"';}
+</script>
+</body>
+</html>

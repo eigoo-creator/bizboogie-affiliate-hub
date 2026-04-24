@@ -1,25 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EIGOO Inc. | Wayfinder's Hub</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #0a0f1e; color: white; font-family: universe,sans-serif; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EIGOO Inc. // Wayfinder's Hub</title>
+<meta name="description" content="The routing core of the EIGOO Inc. digital ecosystem — Agent Z, the Global Squad, and the Wayfinder's Engine." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{
+    --ink:#05070d;
+    --ink-2:#0a0f1e;
+    --line:rgba(56,189,248,.14);
+    --cyan:#22d3ee;
+    --lime:#a3e635;
+    --amber:#fbbf24;
+  }
+  html,body{background:var(--ink);color:#e2e8f0;font-family:'JetBrains Mono',ui-monospace,monospace;}
+  .display{font-family:'Unbounded',system-ui,sans-serif;letter-spacing:-.03em;}
+  .grid-bg{
+    background-image:
+      linear-gradient(var(--line) 1px,transparent 1px),
+      linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:56px 56px;
+    background-position:-1px -1px;
+    mask-image:radial-gradient(ellipse 80% 60% at 50% 40%,#000 40%,transparent 80%);
+  }
+  .scanline{
+    background:repeating-linear-gradient(180deg,rgba(34,211,238,.05) 0 1px,transparent 1px 3px);
+    mix-blend-mode:screen;
+  }
+  .noise{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.8  0 0 0 0 0.9  0 0 0 0 1  0 0 0 0.28 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity:.25;
+  }
+  .halo{
+    background:radial-gradient(600px 400px at 80% 10%,rgba(34,211,238,.18),transparent 60%),
+               radial-gradient(500px 380px at 10% 90%,rgba(163,230,53,.12),transparent 60%);
+  }
+  .tick::before{content:"◢";color:var(--cyan);margin-right:.5rem;font-size:.6em;transform:translateY(-2px);display:inline-block;}
+  .blink{animation:blink 1.2s steps(2) infinite;}
+  @keyframes blink{50%{opacity:0}}
+  .up{opacity:0;transform:translateY(14px);animation:up .8s cubic-bezier(.2,.7,.2,1) forwards;}
+  .d1{animation-delay:.1s}.d2{animation-delay:.2s}.d3{animation-delay:.35s}.d4{animation-delay:.5s}.d5{animation-delay:.65s}.d6{animation-delay:.8s}
+  @keyframes up{to{opacity:1;transform:translateY(0)}}
+  .btn-primary{
+    background:linear-gradient(180deg,#e6fff7,#9ae6d2);
+    color:#04131a;
+    box-shadow:0 0 0 1px rgba(34,211,238,.4),0 20px 60px -20px rgba(34,211,238,.6);
+    transition:transform .2s ease,box-shadow .2s ease,filter .2s ease;
+  }
+  .btn-primary:hover{transform:translateY(-2px);filter:brightness(1.05);box-shadow:0 0 0 1px rgba(34,211,238,.7),0 30px 80px -20px rgba(34,211,238,.8);}
+  .btn-ghost{border:1px solid rgba(226,232,240,.18);transition:border-color .2s,background .2s,transform .2s;}
+  .btn-ghost:hover{border-color:var(--cyan);background:rgba(34,211,238,.07);transform:translateY(-2px);}
+  .chip{border:1px solid rgba(34,211,238,.35);color:#7dd3fc;padding:.25rem .6rem;border-radius:999px;font-size:.7rem;letter-spacing:.18em;}
+  .card{
+    border:1px solid rgba(226,232,240,.08);
+    background:linear-gradient(180deg,rgba(15,23,42,.6),rgba(5,7,13,.4));
+    backdrop-filter:blur(8px);
+    border-radius:18px;
+  }
+  .card:hover{border-color:rgba(34,211,238,.35);}
+  .kbd{font-family:'JetBrains Mono',monospace;font-size:.7rem;padding:.15rem .4rem;border:1px solid rgba(226,232,240,.25);border-bottom-width:2px;border-radius:4px;color:#cbd5e1;background:rgba(255,255,255,.02);}
+  ::selection{background:rgba(34,211,238,.35);color:#fff;}
+  .marquee{display:flex;gap:3rem;animation:slide 28s linear infinite;}
+  @keyframes slide{to{transform:translateX(-50%)}}
+  .diag{background:repeating-linear-gradient(45deg,rgba(34,211,238,.12) 0 1px,transparent 1px 9px);}
+</style>
 </head>
-<body class="min-h-screen flex items-center justify-center text-center p-4">
-    <div class="max-w-lg">
-        <div class="w-20 h-20 bg-gradient-to-br from-cyan-500 to-green-500 rounded-2xl mx-auto mb-8 flex items-center justify-center text-3 xl font-black text-slate-900">GK</div>
-        <h1 class="text-4xl font-black uppercase italic tracking-tighter mb-4">Wayfinder's Hub</h1>
-        <p class="text-cyan-400 text-sm font-bold uppercase tracking-widest mb-8">EIGOO INC. Digital Ecosystem</p>
-        <p class="text-slate-400 mb-8 leading-relaxed">
-            This server handles automated routing for the Global Squad and the Wayfinder's Engine.
-        </p>
-        <div class="flex justify-center gap-4">
-            <a href="https://bizboogie.com" class="bg-color-white text-slate-900 px-6 py-2 rounded-fell font-bold hover:bg-cyan-400 transition-all">MAIN SITE</a>
-        </div>
+<body class="min-h-screen relative overflow-x-hidden">
+  <div class="absolute inset-0 grid-bg pointer-events-none"></div>
+  <div class="absolute inset-0 halo pointer-events-none"></div>
+  <div class="absolute inset-0 scanline pointer-events-none"></div>
+  <div class="absolute inset-0 noise pointer-events-none"></div>
+
+  <!-- Top bar -->
+  <header class="relative z-10 max-w-7xl mx-auto px-6 py-6 flex items-center justify-between" data-testid="site-header">
+    <div class="flex items-center gap-3 up d1">
+      <div class="relative w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-300 to-lime-400 flex items-center justify-center display font-black text-slate-950 text-lg shadow-[0_0_40px_-8px_rgba(34,211,238,.8)]">
+        GK
+        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-lime-400 blink"></span>
+      </div>
+      <div class="leading-tight">
+        <div class="text-[10px] uppercase tracking-[0.3em] text-cyan-300">Eigoo Inc.</div>
+        <div class="display font-black text-sm tracking-tight">Wayfinder's Hub</div>
+      </div>
     </div>
+    <nav class="flex items-center gap-4 text-xs uppercase tracking-[0.25em] text-slate-400 up d2">
+      <a href="https://bizboogie.com" class="hover:text-cyan-300 transition-colors" data-testid="nav-main">Main Site</a>
+      <span class="text-slate-700">/</span>
+      <a href="#ecosystem" class="hover:text-cyan-300 transition-colors" data-testid="nav-ecosystem">Ecosystem</a>
+      <span class="text-slate-700">/</span>
+      <a href="/admin" class="hover:text-cyan-300 transition-colors" data-testid="nav-admin">Admin</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <main class="relative z-10 max-w-7xl mx-auto px-6 pt-14 pb-24">
+    <section class="grid lg:grid-cols-12 gap-10 items-end">
+      <div class="lg:col-span-8">
+        <div class="flex items-center gap-3 mb-8 up d1">
+          <span class="chip uppercase">Node · 07 Online</span>
+          <span class="text-xs text-slate-500">LAT 37.7749° · LON -122.4194°</span>
+        </div>
+
+        <h1 class="display text-[clamp(3rem,9vw,8.5rem)] leading-[0.88] font-black up d2">
+          <span class="block text-slate-100">Routing the</span>
+          <span class="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-200 to-lime-300">Global Squad.</span>
+        </h1>
+
+        <p class="mt-8 max-w-xl text-slate-400 text-lg leading-relaxed up d3">
+          This server is the quiet backbone of the <span class="text-slate-100">EIGOO Inc.</span> digital ecosystem —
+          dispatching operatives to loadouts, missions and the Wayfinder's Engine, one <span class="text-cyan-300">/go/&lt;slug&gt;</span> at a time.
+        </p>
+
+        <div class="mt-10 flex flex-wrap items-center gap-4 up d4">
+          <a href="https://bizboogie.com" class="btn-primary inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold uppercase tracking-[0.2em]" data-testid="cta-main-site">
+            Main Site
+            <span aria-hidden>→</span>
+          </a>
+          <a href="/admin" class="btn-ghost inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold uppercase tracking-[0.2em] text-slate-200" data-testid="cta-dashboard">
+            Ops Dashboard
+          </a>
+          <span class="text-xs text-slate-500">or try <span class="kbd">/go/agent-z-rig</span></span>
+        </div>
+      </div>
+
+      <!-- Terminal / status panel -->
+      <aside class="lg:col-span-4 up d5" data-testid="status-panel">
+        <div class="card p-5">
+          <div class="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-slate-500">
+            <span>wayfinder.engine</span>
+            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-lime-400 blink"></span>live</span>
+          </div>
+          <div class="mt-4 font-mono text-[13px] leading-7">
+            <div><span class="text-slate-500">$</span> init --squad global</div>
+            <div class="text-cyan-300 tick">agent-z-rig — Command Center Online</div>
+            <div class="text-cyan-300 tick">vr-link-headset — Mission Alpha</div>
+            <div class="text-cyan-300 tick">recon-drone-v1 — Mission Delta</div>
+            <div class="text-lime-400 tick">proton-vpn — Secure Channel Up</div>
+            <div><span class="text-slate-500">$</span> listening on /go/*<span class="blink">▌</span></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mt-4">
+          <div class="card p-4">
+            <div class="text-[10px] uppercase tracking-[0.3em] text-slate-500">Routes</div>
+            <div class="display text-3xl font-black text-slate-50 mt-1">11+</div>
+            <div class="text-xs text-slate-400">affiliate slugs</div>
+          </div>
+          <div class="card p-4">
+            <div class="text-[10px] uppercase tracking-[0.3em] text-slate-500">Uptime</div>
+            <div class="display text-3xl font-black text-lime-400 mt-1">99.9%</div>
+            <div class="text-xs text-slate-400">serverless edge</div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Marquee -->
+    <section class="mt-24 overflow-hidden border-y border-slate-800/80 py-5 up d6" aria-hidden="true">
+      <div class="marquee whitespace-nowrap text-2xl md:text-3xl display font-black text-slate-500 uppercase">
+        <div class="flex gap-10 pr-10 items-center">
+          <span>// Global Squad</span><span class="text-cyan-400">◆</span>
+          <span>Agent Z Approved</span><span class="text-lime-400">◇</span>
+          <span>Wayfinder's Engine</span><span class="text-amber-400">✺</span>
+          <span>Mission Bravo</span><span class="text-cyan-400">◆</span>
+          <span>Secure Channel</span><span class="text-lime-400">◇</span>
+          <span>Commission Tier 1</span><span class="text-amber-400">✺</span>
+        </div>
+        <div class="flex gap-10 pr-10 items-center">
+          <span>// Global Squad</span><span class="text-cyan-400">◆</span>
+          <span>Agent Z Approved</span><span class="text-lime-400">◇</span>
+          <span>Wayfinder's Engine</span><span class="text-amber-400">✺</span>
+          <span>Mission Bravo</span><span class="text-cyan-400">◆</span>
+          <span>Secure Channel</span><span class="text-lime-400">◇</span>
+          <span>Commission Tier 1</span><span class="text-amber-400">✺</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ecosystem -->
+    <section id="ecosystem" class="mt-24">
+      <div class="flex items-end justify-between mb-10">
+        <div>
+          <div class="chip uppercase mb-4">02 / Ecosystem</div>
+          <h2 class="display text-4xl md:text-5xl font-black leading-tight max-w-2xl">What this node actually does.</h2>
+        </div>
+        <div class="hidden md:block diag w-48 h-16 rounded-md"></div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-4">
+        <article class="card p-6" data-testid="feature-router">
+          <div class="text-cyan-300 display font-black text-sm tracking-widest">/GO/</div>
+          <h3 class="display text-2xl font-bold mt-2">Link Router</h3>
+          <p class="text-slate-400 mt-3 text-sm leading-relaxed">Hit <span class="kbd">/go/&lt;slug&gt;</span> and get redirected through the Wayfinder's Engine to the right loadout, mission or partner — sourced live from Airtable.</p>
+        </article>
+        <article class="card p-6" data-testid="feature-tracking">
+          <div class="text-lime-300 display font-black text-sm tracking-widest">TRACKING</div>
+          <h3 class="display text-2xl font-bold mt-2">Click Intel</h3>
+          <p class="text-slate-400 mt-3 text-sm leading-relaxed">Every operative gets counted. Click totals and last-seen stamps flow back to the base so the Squad sees what's working.</p>
+        </article>
+        <article class="card p-6" data-testid="feature-ops">
+          <div class="text-amber-300 display font-black text-sm tracking-widest">OPS</div>
+          <h3 class="display text-2xl font-bold mt-2">Commander Dashboard</h3>
+          <p class="text-slate-400 mt-3 text-sm leading-relaxed">A password-gated ops view of every slug, click count and destination. Copy links. Generate QR. Dispatch squads.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Footer strip -->
+    <footer class="mt-28 flex flex-wrap items-center justify-between gap-4 pt-8 border-t border-slate-800/80 text-xs uppercase tracking-[0.3em] text-slate-500">
+      <div>© <span id="yr"></span> EIGOO Inc. · All rights reserved</div>
+      <div class="flex items-center gap-4">
+        <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-lime-400 blink"></span>Systems Nominal</span>
+        <a href="https://bizboogie.com" class="hover:text-cyan-300" data-testid="footer-main">bizboogie.com</a>
+      </div>
+    </footer>
+  </main>
+
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
 </body>
 </html>

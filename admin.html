@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ops Dashboard // Wayfinder's Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Unbounded:wght@700;900&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{--cyan:#22d3ee;--lime:#a3e635;}
+  html,body{background:#05070d;color:#e2e8f0;font-family:'JetBrains Mono',ui-monospace,monospace;}
+  .display{font-family:'Unbounded',sans-serif;letter-spacing:-.03em;}
+  .grid-bg{background-image:linear-gradient(rgba(56,189,248,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.08) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 40%,transparent 80%);}
+  .card{border:1px solid rgba(226,232,240,.08);background:linear-gradient(180deg,rgba(15,23,42,.6),rgba(5,7,13,.5));backdrop-filter:blur(8px);border-radius:16px;}
+  .chip{border:1px solid rgba(34,211,238,.35);color:#7dd3fc;padding:.2rem .55rem;border-radius:999px;font-size:.65rem;letter-spacing:.18em;}
+  .pill{padding:.15rem .55rem;border-radius:999px;font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;}
+  .pill-on{background:rgba(163,230,53,.12);color:#bef264;border:1px solid rgba(163,230,53,.35);}
+  .pill-off{background:rgba(226,232,240,.05);color:#94a3b8;border:1px solid rgba(226,232,240,.1);}
+  .blink{animation:blink 1.2s steps(2) infinite;}@keyframes blink{50%{opacity:0}}
+  input,button{font-family:inherit;}
+  .btn{border:1px solid rgba(226,232,240,.18);padding:.55rem .9rem;border-radius:8px;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;transition:all .2s;}
+  .btn:hover{border-color:var(--cyan);background:rgba(34,211,238,.08);}
+  .btn-p{background:linear-gradient(180deg,#e6fff7,#9ae6d2);color:#04131a;border:0;font-weight:700;box-shadow:0 10px 40px -15px rgba(34,211,238,.7);}
+  .btn-p:hover{filter:brightness(1.05);}
+  table{border-collapse:separate;border-spacing:0;}
+  th,td{padding:.85rem 1rem;text-align:left;}
+  thead th{font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:#64748b;border-bottom:1px solid rgba(226,232,240,.08);}
+  tbody tr{border-bottom:1px solid rgba(226,232,240,.05);}
+  tbody tr:hover{background:rgba(34,211,238,.03);}
+  .kbd{font-size:.7rem;padding:.15rem .4rem;border:1px solid rgba(226,232,240,.2);border-bottom-width:2px;border-radius:4px;color:#cbd5e1;background:rgba(255,255,255,.02);}
+  .toast{position:fixed;bottom:24px;right:24px;background:#0a0f1e;border:1px solid rgba(34,211,238,.4);padding:.7rem 1rem;border-radius:10px;font-size:.8rem;opacity:0;transform:translateY(8px);transition:all .25s;}
+  .toast.on{opacity:1;transform:translateY(0);}
+  details > summary{list-style:none;cursor:pointer;}
+  details > summary::-webkit-details-marker{display:none;}
+</style>
+</head>
+<body class="min-h-screen relative">
+  <div class="absolute inset-0 grid-bg pointer-events-none"></div>
+
+  <header class="relative z-10 max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-3" data-testid="logo-home">
+      <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-300 to-lime-400 flex items-center justify-center display font-black text-slate-950 text-sm">GK</div>
+      <div class="leading-tight">
+        <div class="text-[10px] uppercase tracking-[0.3em] text-cyan-300">EIGOO Inc.</div>
+        <div class="display font-black text-sm">Ops Dashboard</div>
+      </div>
+    </a>
+    <div class="flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] text-slate-500">
+      <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-lime-400 blink"></span>live</span>
+      <a href="/" class="hover:text-cyan-300" data-testid="nav-hub">Hub</a>
+    </div>
+  </header>
+
+  <!-- Gate -->
+  <section id="gate" class="relative z-10 max-w-md mx-auto px-6 mt-20" data-testid="gate-panel">
+    <div class="chip inline-block mb-6">01 / Authenticate</div>
+    <h1 class="display text-4xl font-black leading-tight">Enter Commander Key.</h1>
+    <p class="text-slate-400 mt-3 text-sm">Access restricted to Agent Z and the Global Squad.</p>
+    <form id="gate-form" class="mt-8 card p-5 space-y-3" autocomplete="off">
+      <label class="block text-[10px] uppercase tracking-[0.3em] text-slate-500">Admin Password</label>
+      <input id="pw" type="password" class="w-full bg-transparent border border-slate-700 focus:border-cyan-400 outline-none rounded-lg px-4 py-3 text-slate-100" placeholder="••••••••" data-testid="password-input" />
+      <div class="flex items-center justify-between">
+        <label class="flex items-center gap-2 text-xs text-slate-400"><input id="remember" type="checkbox" class="accent-cyan-400"/> Remember on this device</label>
+        <button type="submit" class="btn-p rounded-full px-5 py-2 text-xs uppercase tracking-[0.2em]" data-testid="unlock-btn">Unlock →</button>
+      </div>
+      <div id="gate-err" class="hidden text-xs text-red-400" data-testid="gate-error">Wrong key. Try again.</div>
+    </form>
+  </section>
+
+  <!-- Dashboard -->
+  <section id="dash" class="relative z-10 max-w-7xl mx-auto px-6 pt-10 pb-20 hidden" data-testid="dashboard-panel">
+    <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+      <div>
+        <div class="chip inline-block mb-3">02 / Signals</div>
+        <h1 class="display text-4xl font-black">Routing Intel.</h1>
+        <p class="text-slate-400 text-sm mt-1">Live from the base. Sorted by clicks, descending.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <input id="filter" class="bg-transparent border border-slate-700 focus:border-cyan-400 outline-none rounded-lg px-3 py-2 text-sm" placeholder="filter slug, product, mission…" data-testid="filter-input" />
+        <button id="refresh" class="btn" data-testid="refresh-btn">Refresh</button>
+        <button id="logout" class="btn" data-testid="logout-btn">Logout</button>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-4 gap-3 mb-8">
+      <div class="card p-4"><div class="text-[10px] uppercase tracking-[0.3em] text-slate-500">Slugs</div><div id="k-total" class="display text-3xl font-black mt-1">–</div></div>
+      <div class="card p-4"><div class="text-[10px] uppercase tracking-[0.3em] text-slate-500">Clicks</div><div id="k-clicks" class="display text-3xl font-black text-cyan-300 mt-1">–</div></div>
+      <div class="card p-4"><div class="text-[10px] uppercase tracking-[0.3em] text-slate-500">Approved</div><div id="k-approved" class="display text-3xl font-black text-lime-400 mt-1">–</div></div>
+      <div class="card p-4"><div class="text-[10px] uppercase tracking-[0.3em] text-slate-500">Top Slug</div><div id="k-top" class="font-bold mt-1 truncate">–</div></div>
+    </div>
+
+    <div class="card overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr>
+              <th>Slug</th>
+              <th>Product</th>
+              <th>Mission</th>
+              <th>Platform</th>
+              <th class="text-right">Clicks</th>
+              <th>Last</th>
+              <th>Status</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="rows" data-testid="rows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- QR modal -->
+    <div id="qr-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50 p-6" data-testid="qr-modal">
+      <div class="card max-w-sm w-full p-6 text-center relative">
+        <button id="qr-close" class="absolute top-3 right-3 text-slate-400 hover:text-white" data-testid="qr-close">✕</button>
+        <div class="chip inline-block mb-3">QR Dispatch</div>
+        <div id="qr-slug" class="display text-lg font-bold break-all mb-4">–</div>
+        <img id="qr-img" alt="qr" class="w-64 h-64 mx-auto rounded-lg bg-white p-2" />
+        <a id="qr-dl" class="btn inline-block mt-4" download>Download PNG</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="toast" class="toast" data-testid="toast">Copied.</div>
+
+<script>
+const PW_KEY='eigoo_admin_pw';
+const gate=document.getElementById('gate'),dash=document.getElementById('dash');
+const rows=document.getElementById('rows');
+let data=null;
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1500);}
+
+async function load(pw){
+  const res=await fetch('/api/admin?password='+encodeURIComponent(pw),{cache:'no-store'});
+  if(res.status===401)throw new Error('unauthorized');
+  if(!res.ok)throw new Error('server error');
+  return res.json();
+}
+
+function fmtDate(s){if(!s)return '—';const d=new Date(s);if(isNaN(d))return '—';return d.toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
+
+function render(list){
+  rows.innerHTML='';
+  list.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td class="font-semibold text-cyan-300">${r.slug||'—'}</td>
+      <td class="text-slate-200">${r.productName||'—'}</td>
+      <td class="text-slate-400">${r.mission||'—'}</td>
+      <td class="text-slate-400">${r.platform||'—'}</td>
+      <td class="text-right display font-bold ${r.clickCount>0?'text-lime-400':'text-slate-500'}">${r.clickCount}</td>
+      <td class="text-slate-500 text-xs">${fmtDate(r.lastClicked)}</td>
+      <td><span class="pill ${r.approved?'pill-on':'pill-off'}">${r.approved?'approved':'pending'}</span></td>
+      <td class="text-right whitespace-nowrap">
+        ${r.slug?`<button class="btn mr-1" data-act="copy" data-slug="${r.slug}" data-testid="copy-${r.slug}">Copy</button>`:''}
+        ${r.slug?`<button class="btn mr-1" data-act="qr" data-slug="${r.slug}" data-testid="qr-${r.slug}">QR</button>`:''}
+        ${r.affiliateLink?`<a class="btn" href="${r.affiliateLink}" target="_blank" rel="noopener">Open</a>`:''}
+      </td>`;
+    rows.appendChild(tr);
+  });
+}
+
+function hydrate(){
+  if(!data)return;
+  const f=(document.getElementById('filter').value||'').toLowerCase();
+  const list=data.records.filter(r=>!f||[r.slug,r.productName,r.mission,r.platform,r.category].filter(Boolean).some(v=>String(v).toLowerCase().includes(f)));
+  document.getElementById('k-total').textContent=data.total;
+  document.getElementById('k-clicks').textContent=data.totalClicks;
+  document.getElementById('k-approved').textContent=data.records.filter(r=>r.approved).length;
+  document.getElementById('k-top').textContent=(data.records[0]&&data.records[0].slug)||'—';
+  render(list);
+}
+
+async function boot(pw){
+  try{data=await load(pw);gate.classList.add('hidden');dash.classList.remove('hidden');hydrate();}
+  catch(e){
+    if(e.message==='unauthorized'){document.getElementById('gate-err').classList.remove('hidden');sessionStorage.removeItem(PW_KEY);localStorage.removeItem(PW_KEY);gate.classList.remove('hidden');dash.classList.add('hidden');}
+    else{toast('Failed to load: '+e.message);}
+  }
+}
+
+document.getElementById('gate-form').addEventListener('submit',(e)=>{
+  e.preventDefault();
+  const pw=document.getElementById('pw').value.trim();
+  if(!pw)return;
+  if(document.getElementById('remember').checked)localStorage.setItem(PW_KEY,pw);else sessionStorage.setItem(PW_KEY,pw);
+  boot(pw);
+});
+
+document.getElementById('refresh').addEventListener('click',()=>{
+  const pw=localStorage.getItem(PW_KEY)||sessionStorage.getItem(PW_KEY);
+  if(pw)boot(pw);
+});
+document.getElementById('logout').addEventListener('click',()=>{localStorage.removeItem(PW_KEY);sessionStorage.removeItem(PW_KEY);data=null;gate.classList.remove('hidden');dash.classList.add('hidden');});
+document.getElementById('filter').addEventListener('input',hydrate);
+
+rows.addEventListener('click',(e)=>{
+  const b=e.target.closest('button[data-act]');if(!b)return;
+  const slug=b.dataset.slug;
+  if(b.dataset.act==='copy'){
+    const url=location.origin+'/go/'+slug;
+    navigator.clipboard.writeText(url).then(()=>toast('Copied '+url));
+  }
+  if(b.dataset.act==='qr'){
+    document.getElementById('qr-slug').textContent='/go/'+slug;
+    document.getElementById('qr-img').src='/api/qr?slug='+encodeURIComponent(slug);
+    document.getElementById('qr-dl').href='/api/qr?slug='+encodeURIComponent(slug);
+    document.getElementById('qr-dl').setAttribute('download',slug+'-qr.png');
+    const m=document.getElementById('qr-modal');m.classList.remove('hidden');m.style.display='flex';
+  }
+});
+document.getElementById('qr-close').addEventListener('click',()=>{const m=document.getElementById('qr-modal');m.classList.add('hidden');m.style.display='';});
+
+// auto-login
+const savedPw=localStorage.getItem(PW_KEY)||sessionStorage.getItem(PW_KEY);
+if(savedPw)boot(savedPw);
+</script>
+</body>
+</html>
