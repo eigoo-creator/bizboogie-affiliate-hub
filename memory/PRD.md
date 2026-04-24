@@ -24,6 +24,12 @@
 - Admin endpoint requires `ADMIN_PASSWORD`.
 - Everything configured via env vars; no secrets in source.
 
+## Implemented (2026-04-24 — domain-aware attribution)
+- [x] `api/go.js` now captures `Host` header (strips `www.`) and writes it to the Click Log record. Two-tier retry on UNKNOWN_FIELD_NAME so it works even if the `Host` column is missing.
+- [x] `api/admin.js` aggregates `byHost` and `bySlugHost` alongside the source counts.
+- [x] `admin.html` adds a **Property Attribution** panel next to the Channel Attribution panel — shows per-domain bars (`play.bizboogie.com` vs `cyberops.bizboogie.com` vs `bizboogie.com`). Graceful empty state with setup hint.
+- [x] README schema updated to include the optional `Host` column on `Click Log`.
+
 ## Implemented (2026-04-24 — attribution update)
 - [x] `/go/:slug?src=ig&c=spring-drop` parses source + campaign.
 - [x] `api/go.js` fire-and-forget writes `Last Source` on product row + creates record in optional `Click Log` table. Two-tier graceful degradation (unknown field → retry without; unknown table → swallow).

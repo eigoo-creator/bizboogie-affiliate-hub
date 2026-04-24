@@ -71,6 +71,7 @@ module.exports = async (req, res) => {
               campaign: r.get('Campaign') || null,
               clickedAt: r.get('Clicked At') || null,
               country: r.get('Country') || null,
+              host: r.get('Host') || null,
             });
           });
           next();
@@ -82,12 +83,22 @@ module.exports = async (req, res) => {
     // --- Aggregate attribution ---
     const bySource = {};
     const bySlugSource = {};
+    const byHost = {};
+    const bySlugHost = {};
     logs.forEach((l) => {
       const src = l.source || 'direct';
       bySource[src] = (bySource[src] || 0) + 1;
       if (l.slug) {
         if (!bySlugSource[l.slug]) bySlugSource[l.slug] = {};
         bySlugSource[l.slug][src] = (bySlugSource[l.slug][src] || 0) + 1;
+      }
+      if (l.host) {
+        const h = String(l.host).replace(/^www\./, '');
+        byHost[h] = (byHost[h] || 0) + 1;
+        if (l.slug) {
+          if (!bySlugHost[l.slug]) bySlugHost[l.slug] = {};
+          bySlugHost[l.slug][h] = (bySlugHost[l.slug][h] || 0) + 1;
+        }
       }
     });
 
@@ -105,6 +116,8 @@ module.exports = async (req, res) => {
             logsCount: logs.length,
             bySource,
             bySlugSource,
+            byHost,
+            bySlugHost,
           },
         },
         null,

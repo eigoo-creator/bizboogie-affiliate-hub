@@ -107,19 +107,34 @@
     </div>
 
     <!-- Attribution Panel -->
-    <div class="card p-5 mb-6" data-testid="attribution-panel">
-      <div class="flex items-center justify-between mb-3">
-        <div>
-          <div class="text-[10px] uppercase tracking-[0.3em] text-slate-500">03 / Channel Attribution</div>
-          <div class="display text-lg font-bold">Where the clicks come from</div>
+    <div class="grid md:grid-cols-2 gap-4 mb-6">
+      <div class="card p-5" data-testid="attribution-panel">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <div class="text-[10px] uppercase tracking-[0.3em] text-slate-500">03 / Channel Attribution</div>
+            <div class="display text-lg font-bold">By source</div>
+          </div>
+          <div id="attr-status" class="text-xs text-slate-500">—</div>
         </div>
-        <div id="attr-status" class="text-xs text-slate-500">—</div>
+        <div id="attr-bars" class="space-y-2"></div>
+        <div id="attr-empty" class="hidden text-xs text-slate-500 italic">
+          No <span class="kbd">Click Log</span> table found. Create it in Airtable with columns
+          <span class="kbd">Slug</span>, <span class="kbd">Source</span>, <span class="kbd">Campaign</span>,
+          <span class="kbd">Clicked At</span>, <span class="kbd">Referer</span>, <span class="kbd">User Agent</span>, <span class="kbd">Country</span>, <span class="kbd">Host</span>.
+        </div>
       </div>
-      <div id="attr-bars" class="space-y-2"></div>
-      <div id="attr-empty" class="hidden text-xs text-slate-500 italic">
-        No <span class="kbd">Click Log</span> table found. Create an Airtable table named <span class="kbd">Click Log</span> with columns
-        <span class="kbd">Slug</span>, <span class="kbd">Source</span>, <span class="kbd">Campaign</span>,
-        <span class="kbd">Clicked At</span> (datetime), <span class="kbd">Referer</span>, <span class="kbd">User Agent</span>, <span class="kbd">Country</span> to enable per-channel attribution.
+      <div class="card p-5" data-testid="host-panel">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <div class="text-[10px] uppercase tracking-[0.3em] text-slate-500">04 / Property Attribution</div>
+            <div class="display text-lg font-bold">By domain</div>
+          </div>
+          <div id="host-status" class="text-xs text-slate-500">—</div>
+        </div>
+        <div id="host-bars" class="space-y-2"></div>
+        <div id="host-empty" class="hidden text-xs text-slate-500 italic">
+          Add a <span class="kbd">Host</span> column (single-line text) to <span class="kbd">Click Log</span> to see which of <span class="kbd">play.bizboogie.com</span> / <span class="kbd">cyberops.bizboogie.com</span> / <span class="kbd">bizboogie.com</span> drove each click.
+        </div>
       </div>
     </div>
 
@@ -249,23 +264,45 @@ function render(list){
 
 function renderAttribution(){
   const a=data&&data.attribution;
+  // Sources
   const st=document.getElementById('attr-status');
   const bars=document.getElementById('attr-bars');
   const empty=document.getElementById('attr-empty');
-  if(!a||!a.available){bars.innerHTML='';empty.classList.remove('hidden');st.textContent='click log: offline';return;}
-  empty.classList.add('hidden');
-  const entries=Object.entries(a.bySource).sort((x,y)=>y[1]-x[1]);
-  const total=entries.reduce((s,[,v])=>s+v,0)||1;
-  st.textContent=`${a.logsCount} logs · ${entries.length} channels`;
-  if(entries.length===0){bars.innerHTML='<div class="text-xs text-slate-500 italic">No logged clicks yet — append <span class="kbd">?src=ig</span> (or any channel) to any <span class="kbd">/go/&lt;slug&gt;</span> URL to start recording.</div>';return;}
-  bars.innerHTML=entries.map(([s,v])=>{
-    const pct=(v/total*100).toFixed(1);
-    return `<div class="flex items-center gap-3">
-      <div class="w-24 flex-shrink-0">${srcBadge(s)}</div>
-      <div class="flex-1 bar"><span style="width:${pct}%"></span></div>
-      <div class="w-24 text-right font-bold text-slate-200">${v} <span class="text-slate-500 text-xs">(${pct}%)</span></div>
-    </div>`;
-  }).join('');
+  if(!a||!a.available){bars.innerHTML='';empty.classList.remove('hidden');st.textContent='click log: offline';}
+  else{
+    empty.classList.add('hidden');
+    const entries=Object.entries(a.bySource).sort((x,y)=>y[1]-x[1]);
+    const total=entries.reduce((s,[,v])=>s+v,0)||1;
+    st.textContent=`${a.logsCount} logs · ${entries.length} channels`;
+    bars.innerHTML=entries.length?entries.map(([s,v])=>{
+      const pct=(v/total*100).toFixed(1);
+      return `<div class="flex items-center gap-3">
+        <div class="w-24 flex-shrink-0">${srcBadge(s)}</div>
+        <div class="flex-1 bar"><span style="width:${pct}%"></span></div>
+        <div class="w-24 text-right font-bold text-slate-200">${v} <span class="text-slate-500 text-xs">(${pct}%)</span></div>
+      </div>`;
+    }).join(''):'<div class="text-xs text-slate-500 italic">No logged clicks yet — append <span class="kbd">?src=ig</span> to any <span class="kbd">/go/&lt;slug&gt;</span> URL.</div>';
+  }
+  // Hosts
+  const hst=document.getElementById('host-status');
+  const hbars=document.getElementById('host-bars');
+  const hempty=document.getElementById('host-empty');
+  const byHost=(a&&a.byHost)||{};
+  const hostEntries=Object.entries(byHost).sort((x,y)=>y[1]-x[1]);
+  if(!a||!a.available||hostEntries.length===0){hbars.innerHTML='';hempty.classList.remove('hidden');hst.textContent=a&&a.available?'no host data yet':'click log: offline';}
+  else{
+    hempty.classList.add('hidden');
+    const total=hostEntries.reduce((s,[,v])=>s+v,0)||1;
+    hst.textContent=`${hostEntries.length} propert${hostEntries.length===1?'y':'ies'}`;
+    hbars.innerHTML=hostEntries.map(([h,v])=>{
+      const pct=(v/total*100).toFixed(1);
+      return `<div class="flex items-center gap-3">
+        <div class="w-40 flex-shrink-0 truncate text-xs text-cyan-300 font-semibold">${h}</div>
+        <div class="flex-1 bar"><span style="width:${pct}%"></span></div>
+        <div class="w-24 text-right font-bold text-slate-200">${v} <span class="text-slate-500 text-xs">(${pct}%)</span></div>
+      </div>`;
+    }).join('');
+  }
 }
 
 function hydrate(){

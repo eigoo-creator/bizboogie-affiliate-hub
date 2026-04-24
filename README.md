@@ -39,7 +39,7 @@ See `.env.example`.
 - `Last Clicked` — *Date (with time)*
 - `Last Source` — *Single line text*
 
-### Optional — separate table `Click Log` (enable per-channel attribution)
+### Optional — separate table `Click Log` (enable per-channel + per-domain attribution)
 Create a table named exactly `Click Log` with columns:
 - `Slug` — Single line text
 - `Source` — Single line text (e.g. `ig`, `yt`, `tiktok`, `newsletter`, `discord`)
@@ -48,6 +48,7 @@ Create a table named exactly `Click Log` with columns:
 - `Referer` — Long text
 - `User Agent` — Long text
 - `Country` — Single line text (populated from Vercel/Cloudflare geo header)
+- `Host` — Single line text (the domain that served the click, e.g. `play.bizboogie.com` — powers the Property Attribution panel)
 
 If any of these optional fields/tables are missing, redirects still work — writes are silently skipped.
 

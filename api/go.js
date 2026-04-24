@@ -81,6 +81,7 @@ module.exports = async (req, res) => {
     });
 
     // 2) Click Log record (if table exists)
+    const host = pick(req.headers['x-forwarded-host'] || req.headers.host, 120);
     base(LOG_TABLE)
       .create([
         {
@@ -92,12 +93,22 @@ module.exports = async (req, res) => {
             Referer: referer,
             'User Agent': ua,
             Country: country,
+            Host: host,
           },
         },
       ])
       .catch((err) => {
-        // NOT_FOUND -> table doesn't exist; UNKNOWN_FIELD_NAME -> missing columns; both are fine.
-        if (err && !['NOT_FOUND', 'UNKNOWN_FIELD_NAME', 'TABLE_NOT_FOUND'].includes(err.error)) {
+        // Retry without Host if that field doesn't exist
+        if (err && err.error === 'UNKNOWN_FIELD_NAME') {
+          base(LOG_TABLE).create([{ fields: {
+            Slug: slug, Source: src, Campaign: campaign,
+            'Clicked At': nowIso, Referer: referer, 'User Agent': ua, Country: country,
+          }}]).catch((err2) => {
+            if (err2 && !['NOT_FOUND','UNKNOWN_FIELD_NAME','TABLE_NOT_FOUND'].includes(err2.error)) {
+              console.error('click log failed:', err2.message || err2);
+            }
+          });
+        } else if (err && !['NOT_FOUND', 'TABLE_NOT_FOUND'].includes(err.error)) {
           console.error('click log failed:', err.message || err);
         }
       });
