@@ -1,2 +1,30 @@
-Y29uc3QgQWlydGFibGUgPSByZXF1aXJlKCdhaXJ0YWJsZScpOwoKbW9kdWxlLmV4cG9ydHMgPSBhc3luYyAocmVxLCByZXMpID0+IHsKICBjb25zdCB7IHNsdWcgfSA9IHJlcS5xdWVyeTsKICAKICBpZiAoIXNsdWcpIHsKICAgIHJlcy53cml0ZUhlYWQoMzAyLCB7IExvY2F0aW9uOiAnaHR0cHM6Ly9iaXpib29naWUuY29tJyB9KTsKICAgIHJlcy5lbmQoKTsKICAgIHJldHVybjsKICB9CgogIGNvbnN0IHRva2VuID0gcHJvY2Vzcy5lbnYuQUlSVEFCTEVfVE9LRU47CiAgY29uc3QgYmFzZUlkID0gcHJvY2Vzcy5lbnYuQUlSVEFCTEVfQkFTRV9JRDsKCiAgaWYgKCF0b2tlbiB8fCAhYmFzZUlkKSB7CiAgICBjb25zb2xlLmVycm9yKCJNaXNzaW5nIEVudmlyb25tZW50IFZhcmlhYmxlcyIpOwogICAgcmVzLndyaXRlSGVhZCgzMDIsIHsgTG9jYXRpb246ICdodHRwczovL2JpemJvb2dpZS5jb20nIH0pOwogICAgcmVzLmVuZCgpOwogICAgcmV0dXJuOwogIH0KCiAgY29uc3QgYmFzZSA9IG5ldyBBaXJ0YWJsZSh7IGFwaUtleTogdG9rZW4gfSkuYmFzZShiYXNlSWQpOwogIAogIHRyeSB7CiAgICBjb25zdCByZWNvcmRzID0gYXdhaXQgYmFzZSgnQmZmaWxpYXRlIFByb2R1Y3RzJyku
-c2VsZWN0KHsKICAgICAgZmlsdGVyQnlGb3JtdWxhOiBge1NsdWd9ID0gJyR7c2x1Z30nYCwKICAgICAgbWF4UmVjb3JkczogMQogICAgfSkuZmlyc3RQYWdlKCk7CgogICAgaWYgKHJlY29yZHMubGVuZ3RoID4gMCAmJiByZWNvcmRzWzBdLmZpZWxkcyhbJ0FmZpbGlhdGUgTGluayddKSB7CiAgICAgIHJlcy53cml0ZUhlYWQoMzAyLCB7IExvY2F0aW9uOiByZWNvcmRzWzBdLmZpZWxkc1snQWZmaWxpYXRlIExpbmsnXSB9KTsKICAgICAgcmVzLmVuZCgpOwogICAgfSBlbHNlIHsKICAgICAgcmVzLndyaXRlSGVhZCgzMDIsIHsgTG9jYXRpb246ICdodHRwczovL2JpemJvb2dpZS5jb20nIH0pOwogICAgICByZXMuZW5kKCk7CiAgICB9CiAgfSBjYXRjaCAoZXJyb3IpIHsKICAgIGNvbnNvbGUuZXJyb3IoIkFpcnRhYmxlIEVycm9yOiIsIGVycm9yKTsKICAgIHJlcy53cml0ZUhlYWQoMzAyLCB7IExvY2F0aW9uOiAnaHR0cHM6Ly9iaXpib29naWUuY29tJyB9KTsKICAgIHJlcy5lbmQoKTsKICB9Cn07
+const Airtable = require('airtable');
+
+export default async function handler(req, res) {
+  const { slug } = req.query;
+  
+  if (!slug) {
+    return res.redirect(302, 'https://bizboogie.com');
+  }
+
+  const token = process.env.AIRTABLE_TOKEN;
+  const baseId = process.env.AIRTABLE_BASE_ID;
+
+  if (!token || !baseId) {
+    console.error("Missing Airtable Environment Variables");
+    return res.redirect(302, 'https://bizboogie.com');
+  }
+
+  const base = new Airtable({ apiKey: token }).base(baseId);
+  
+  try {
+    const records = await base('Aff–Æ–FR&öGV7G2r’ç6VÆV7B‡°¢f–ÇFW$'”f÷&×VÆ¢µ6ÇVwÒÒrG·6ÇVwÒvÀ¢Ö…&V6÷&G3¢¢Ò’æf—'7EvR‚“° ¢–b‡&V6÷&G2bb&V6÷&G2æÆVæwF‚âbb&V6÷&G5³Òæf–VÆG5²tfiliate Link']) {
+      return res.redirect(302, records[0].fields['Affiliate Link']);
+    }
+  } catch (error) {
+    console.error("Airtable Fetch Error:", error);
+  }
+
+  // Fallback
+  return res.redirect(302, 'https://bizboogie.com');
+}
