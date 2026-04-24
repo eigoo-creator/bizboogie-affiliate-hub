@@ -24,6 +24,11 @@
 - Admin endpoint requires `ADMIN_PASSWORD`.
 - Everything configured via env vars; no secrets in source.
 
+## Implemented (2026-04-24 — FastAPI drop-in kit)
+- [x] `/app/snippets/affiliate_router.py` — single-file FastAPI router mirroring api/go.js. Routes: `GET /go/{slug}`, `GET /api/go/{slug}`, `GET /api/admin`, `GET /api/qr`. Uses `httpx` for Airtable, `qrcode` for QR, `asyncio.create_task` for fire-and-forget tracking. Same env var contract as this hub so all three brand apps share one Airtable base. Lint clean, verified end-to-end against live Airtable (302 redirects, 11-record admin response with full attribution keys, QR PNG with X-QR-Target header).
+- [x] `/app/snippets/GoRedirect.jsx` — React component that handles `/go/:slug` on Emergent's ingress (which only routes `/api/*` to backend) by hard-redirecting to `/api/go/:slug` preserving querystring. Drop-in `<Route path="/go/:slug" element={<GoRedirect/>}/>`.
+- [x] `/app/snippets/INSTALL.md` — copy-pasteable install prompt for the `techops-hub-4` and `stream-admin-test` Emergent sessions, plus verification curls + custom-domain notes.
+
 ## Implemented (2026-04-24 — domain-aware attribution)
 - [x] `api/go.js` now captures `Host` header (strips `www.`) and writes it to the Click Log record. Two-tier retry on UNKNOWN_FIELD_NAME so it works even if the `Host` column is missing.
 - [x] `api/admin.js` aggregates `byHost` and `bySlugHost` alongside the source counts.
