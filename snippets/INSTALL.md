@@ -46,13 +46,13 @@ Paste this prompt into the chat of `techops-hub-4` and then `stream-admin-test`:
 > ```
 > Install with `pip install -r requirements.txt` and restart the backend.
 >
-> **e.** Add these env vars to `backend/.env`:
+> **e.** Add these env vars to `backend/.env` (use the real values from your password manager / Vercel env — do NOT paste them into anything that gets committed):
 > ```
-> AIRTABLE_TOKEN=REDACTED_TOKEN
-> AIRTABLE_BASE_ID=appcAUcJQ5lEBTv7D
+> AIRTABLE_TOKEN=<your Airtable PAT — copy from Vercel or create a new one>
+> AIRTABLE_BASE_ID=<your base id, e.g. appXXXXXXXXXXXXXX>
 > AIRTABLE_TABLE=Affiliate Products
 > AIRTABLE_LOG_TABLE=Click Log
-> ADMIN_PASSWORD=REDACTED_ADMIN_PW
+> ADMIN_PASSWORD=<a strong password>
 > FALLBACK_URL=https://bizboogie.com
 > ```
 > Restart the backend with `sudo supervisorctl restart backend`.
@@ -75,7 +75,7 @@ After both brand sessions finish:
    ```
    All three should 302 to the same Amazon URL.
 
-2. Open `https://affiliate.bizboogie.com/admin` → enter `REDACTED_ADMIN_PW`.
+2. Open `https://affiliate.bizboogie.com/admin` → enter your `ADMIN_PASSWORD`.
 3. The **Property Attribution** panel should now show:
    - `techops-hub-4.preview.emergentagent.com` — 1 click
    - `stream-admin-test.preview.emergentagent.com` — 1 click

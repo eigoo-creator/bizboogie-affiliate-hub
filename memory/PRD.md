@@ -10,7 +10,7 @@
 ## Architecture
 - Static: `index.html`, `not-found.html`, `admin.html` served from repo root
 - Serverless: `api/go.js`, `api/admin.js`, `api/qr.js` (Vercel functions; Node 20)
-- Data: Airtable base `appcAUcJQ5lEBTv7D`, table `Affiliate Products`
+- Data: Airtable base (id in `AIRTABLE_BASE_ID` env var), table `Affiliate Products`
 - Local dev: `dev-server.js` simulates Vercel routing; supervisor runs two instances on ports 3000 (static) and 8001 (API) so the kubernetes ingress reaches both.
 
 ## User personas

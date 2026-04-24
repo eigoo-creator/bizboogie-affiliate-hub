@@ -20,7 +20,7 @@ Serverless affiliate link router + ops dashboard + channel attribution, powered 
 | Key | Required | Example / default |
 | --- | --- | --- |
 | `AIRTABLE_TOKEN` | yes | `pat…` (PAT with `data.records:read` + `data.records:write` on this base) |
-| `AIRTABLE_BASE_ID` | yes | `appcAUcJQ5lEBTv7D` |
+| `AIRTABLE_BASE_ID` | yes | `appXXXXXXXXXXXXXX` (starts with `app`) |
 | `AIRTABLE_TABLE` | no — default `Affiliate Products` | `Affiliate Products` |
 | `AIRTABLE_LOG_TABLE` | no — default `Click Log` | `Click Log` |
 | `ADMIN_PASSWORD` | yes (for `/admin`) | any strong string |
