@@ -24,6 +24,14 @@
 - Admin endpoint requires `ADMIN_PASSWORD`.
 - Everything configured via env vars; no secrets in source.
 
+## Implemented (2026-04-24 — attribution update)
+- [x] `/go/:slug?src=ig&c=spring-drop` parses source + campaign.
+- [x] `api/go.js` fire-and-forget writes `Last Source` on product row + creates record in optional `Click Log` table. Two-tier graceful degradation (unknown field → retry without; unknown table → swallow).
+- [x] `api/admin.js` reads up to 2000 Click Log entries, aggregates `bySource` and `bySlugSource`; returns `attribution.available:false` when table missing so UI can show a setup hint.
+- [x] `api/qr.js` accepts `src`/`c`, embeds them in the encoded URL (QR preserves attribution).
+- [x] `admin.html` adds: Channel Attribution panel with per-source bars + %, row-level source breakdown (expandable), `Top Src` column, **tag as** global source picker that auto-appends `?src=` to Copy/QR outputs, source picker inside QR modal (live-refreshes image + download filename).
+- [x] Verified end-to-end (local + preview): `/go/:slug?src=ig` → 302 redirects correctly; admin returns `attribution.available:false` gracefully; QR returns PNG with `X-QR-Target` header showing tagged URL.
+
 ## Implemented (2026-04-24)
 - [x] Clean `api/go.js`: case-insensitive slug lookup via Airtable formula, 302 redirect, `Click Count` + `Last Clicked` fire-and-forget increment (silently ignores `UNKNOWN_FIELD_NAME`), 302 to `/not-found.html` on miss or missing link.
 - [x] `api/admin.js`: password-gated JSON of all records sorted by click count.
@@ -45,7 +53,17 @@
 - **P2** — Optional per-slug password-gate (for limited-release missions).
 
 ## Next action items
-1. In Airtable "Affiliate Products" table, add two fields to activate click tracking:
+1. **Push to GitHub** (use "Save to GitHub" in the chat input) so Vercel auto-redeploys with the attribution layer. The current `affiliate.bizboogie.com` deploy is stale (serving old broken `api/go.js`).
+2. In Airtable `Affiliate Products` table, add these fields (optional but needed to activate features):
    - `Click Count` — Number (integer)
    - `Last Clicked` — Date with time
-2. Deploy to Vercel: push to GitHub (via Save-to-Github), then in Vercel add env vars `AIRTABLE_TOKEN`, `AIRTABLE_BASE_ID`, `ADMIN_PASSWORD`.
+   - `Last Source` — Single line text
+3. In Airtable, create a new table named exactly `Click Log` with columns:
+   - `Slug` — Single line text
+   - `Source` — Single line text
+   - `Campaign` — Single line text
+   - `Clicked At` — Date with time
+   - `Referer` — Long text
+   - `User Agent` — Long text
+   - `Country` — Single line text
+4. (Optional) Rotate `ADMIN_PASSWORD` in Vercel → Settings → Environment Variables, then redeploy.

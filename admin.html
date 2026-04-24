@@ -18,21 +18,32 @@
   .pill-on{background:rgba(163,230,53,.12);color:#bef264;border:1px solid rgba(163,230,53,.35);}
   .pill-off{background:rgba(226,232,240,.05);color:#94a3b8;border:1px solid rgba(226,232,240,.1);}
   .blink{animation:blink 1.2s steps(2) infinite;}@keyframes blink{50%{opacity:0}}
-  input,button{font-family:inherit;}
-  .btn{border:1px solid rgba(226,232,240,.18);padding:.55rem .9rem;border-radius:8px;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;transition:all .2s;}
+  input,button,select{font-family:inherit;}
+  .btn{border:1px solid rgba(226,232,240,.18);padding:.55rem .9rem;border-radius:8px;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;transition:all .2s;color:#e2e8f0;background:transparent;}
   .btn:hover{border-color:var(--cyan);background:rgba(34,211,238,.08);}
+  .btn-sm{padding:.35rem .6rem;font-size:.65rem;letter-spacing:.15em;}
   .btn-p{background:linear-gradient(180deg,#e6fff7,#9ae6d2);color:#04131a;border:0;font-weight:700;box-shadow:0 10px 40px -15px rgba(34,211,238,.7);}
   .btn-p:hover{filter:brightness(1.05);}
   table{border-collapse:separate;border-spacing:0;}
   th,td{padding:.85rem 1rem;text-align:left;}
-  thead th{font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:#64748b;border-bottom:1px solid rgba(226,232,240,.08);}
+  thead th{font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:#64748b;border-bottom:1px solid rgba(226,232,240,.08);position:sticky;top:0;background:#0a0f1e;}
   tbody tr{border-bottom:1px solid rgba(226,232,240,.05);}
   tbody tr:hover{background:rgba(34,211,238,.03);}
   .kbd{font-size:.7rem;padding:.15rem .4rem;border:1px solid rgba(226,232,240,.2);border-bottom-width:2px;border-radius:4px;color:#cbd5e1;background:rgba(255,255,255,.02);}
-  .toast{position:fixed;bottom:24px;right:24px;background:#0a0f1e;border:1px solid rgba(34,211,238,.4);padding:.7rem 1rem;border-radius:10px;font-size:.8rem;opacity:0;transform:translateY(8px);transition:all .25s;}
+  .toast{position:fixed;bottom:24px;right:24px;background:#0a0f1e;border:1px solid rgba(34,211,238,.4);padding:.7rem 1rem;border-radius:10px;font-size:.8rem;opacity:0;transform:translateY(8px);transition:all .25s;z-index:60;}
   .toast.on{opacity:1;transform:translateY(0);}
-  details > summary{list-style:none;cursor:pointer;}
-  details > summary::-webkit-details-marker{display:none;}
+  .bar{height:6px;border-radius:3px;background:rgba(226,232,240,.07);overflow:hidden;}
+  .bar > span{display:block;height:100%;background:linear-gradient(90deg,#22d3ee,#a3e635);}
+  select.src-picker{background:transparent;border:1px solid rgba(226,232,240,.2);color:#e2e8f0;padding:.35rem .5rem;border-radius:6px;font-size:.7rem;letter-spacing:.1em;}
+  details.row-detail summary{cursor:pointer;list-style:none;}
+  details.row-detail summary::-webkit-details-marker{display:none;}
+  .src-badge{display:inline-flex;align-items:center;gap:.3rem;padding:.15rem .5rem;border-radius:999px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.25);color:#7dd3fc;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;}
+  .src-ig{background:rgba(236,72,153,.08);border-color:rgba(236,72,153,.3);color:#f9a8d4;}
+  .src-yt{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.3);color:#fca5a5;}
+  .src-tt{background:rgba(250,204,21,.08);border-color:rgba(250,204,21,.3);color:#fde68a;}
+  .src-nl{background:rgba(163,230,53,.08);border-color:rgba(163,230,53,.3);color:#d9f99d;}
+  .src-dc{background:rgba(129,140,248,.08);border-color:rgba(129,140,248,.3);color:#c7d2fe;}
+  .src-x{background:rgba(226,232,240,.08);border-color:rgba(226,232,240,.3);color:#e2e8f0;}
 </style>
 </head>
 <body class="min-h-screen relative">
@@ -78,16 +89,38 @@
       </div>
       <div class="flex items-center gap-2">
         <input id="filter" class="bg-transparent border border-slate-700 focus:border-cyan-400 outline-none rounded-lg px-3 py-2 text-sm" placeholder="filter slug, product, mission…" data-testid="filter-input" />
+        <label class="flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-slate-500 pr-2">
+          tag as
+          <select id="global-src" class="src-picker" data-testid="global-src">
+          </select>
+        </label>
         <button id="refresh" class="btn" data-testid="refresh-btn">Refresh</button>
         <button id="logout" class="btn" data-testid="logout-btn">Logout</button>
       </div>
     </div>
 
-    <div class="grid md:grid-cols-4 gap-3 mb-8">
+    <div class="grid md:grid-cols-4 gap-3 mb-6">
       <div class="card p-4"><div class="text-[10px] uppercase tracking-[0.3em] text-slate-500">Slugs</div><div id="k-total" class="display text-3xl font-black mt-1">–</div></div>
       <div class="card p-4"><div class="text-[10px] uppercase tracking-[0.3em] text-slate-500">Clicks</div><div id="k-clicks" class="display text-3xl font-black text-cyan-300 mt-1">–</div></div>
       <div class="card p-4"><div class="text-[10px] uppercase tracking-[0.3em] text-slate-500">Approved</div><div id="k-approved" class="display text-3xl font-black text-lime-400 mt-1">–</div></div>
       <div class="card p-4"><div class="text-[10px] uppercase tracking-[0.3em] text-slate-500">Top Slug</div><div id="k-top" class="font-bold mt-1 truncate">–</div></div>
+    </div>
+
+    <!-- Attribution Panel -->
+    <div class="card p-5 mb-6" data-testid="attribution-panel">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <div class="text-[10px] uppercase tracking-[0.3em] text-slate-500">03 / Channel Attribution</div>
+          <div class="display text-lg font-bold">Where the clicks come from</div>
+        </div>
+        <div id="attr-status" class="text-xs text-slate-500">—</div>
+      </div>
+      <div id="attr-bars" class="space-y-2"></div>
+      <div id="attr-empty" class="hidden text-xs text-slate-500 italic">
+        No <span class="kbd">Click Log</span> table found. Create an Airtable table named <span class="kbd">Click Log</span> with columns
+        <span class="kbd">Slug</span>, <span class="kbd">Source</span>, <span class="kbd">Campaign</span>,
+        <span class="kbd">Clicked At</span> (datetime), <span class="kbd">Referer</span>, <span class="kbd">User Agent</span>, <span class="kbd">Country</span> to enable per-channel attribution.
+      </div>
     </div>
 
     <div class="card overflow-hidden">
@@ -100,6 +133,7 @@
               <th>Mission</th>
               <th>Platform</th>
               <th class="text-right">Clicks</th>
+              <th>Top Src</th>
               <th>Last</th>
               <th>Status</th>
               <th class="text-right">Actions</th>
@@ -115,9 +149,14 @@
       <div class="card max-w-sm w-full p-6 text-center relative">
         <button id="qr-close" class="absolute top-3 right-3 text-slate-400 hover:text-white" data-testid="qr-close">✕</button>
         <div class="chip inline-block mb-3">QR Dispatch</div>
-        <div id="qr-slug" class="display text-lg font-bold break-all mb-4">–</div>
+        <div id="qr-slug" class="display text-lg font-bold break-all mb-1">–</div>
+        <div id="qr-url" class="text-xs text-slate-400 break-all mb-4">–</div>
         <img id="qr-img" alt="qr" class="w-64 h-64 mx-auto rounded-lg bg-white p-2" />
-        <a id="qr-dl" class="btn inline-block mt-4" download>Download PNG</a>
+        <div class="mt-4 flex items-center justify-center gap-2">
+          <label class="text-[10px] uppercase tracking-[0.3em] text-slate-500">src</label>
+          <select id="qr-src" class="src-picker" data-testid="qr-src"></select>
+          <a id="qr-dl" class="btn btn-sm" download>Download</a>
+        </div>
       </div>
     </div>
   </section>
@@ -126,11 +165,31 @@
 
 <script>
 const PW_KEY='eigoo_admin_pw';
+const SRC_KEY='eigoo_sources';
+const DEFAULT_SOURCES=['direct','ig','yt','tiktok','x','newsletter','discord','linkedin'];
+const SRC_CLASS={ig:'src-ig',yt:'src-yt',tiktok:'src-tt',newsletter:'src-nl',discord:'src-dc',x:'src-x'};
+
 const gate=document.getElementById('gate'),dash=document.getElementById('dash');
 const rows=document.getElementById('rows');
 let data=null;
 
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1500);}
+function loadSources(){
+  try{return JSON.parse(localStorage.getItem(SRC_KEY))||DEFAULT_SOURCES;}catch(e){return DEFAULT_SOURCES;}
+}
+function refreshSourceSelects(){
+  const srcs=loadSources();
+  const fill=(el,extraTop)=>{
+    if(!el)return;
+    el.innerHTML='';
+    (extraTop||[]).concat(srcs).forEach(s=>{
+      const o=document.createElement('option');o.value=s;o.textContent=s;el.appendChild(o);
+    });
+  };
+  fill(document.getElementById('global-src'));
+  fill(document.getElementById('qr-src'));
+}
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1600);}
 
 async function load(pw){
   const res=await fetch('/api/admin?password='+encodeURIComponent(pw),{cache:'no-store'});
@@ -141,9 +200,22 @@ async function load(pw){
 
 function fmtDate(s){if(!s)return '—';const d=new Date(s);if(isNaN(d))return '—';return d.toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
 
+function srcBadge(s){if(!s)return '<span class="text-slate-600">—</span>';const cls=SRC_CLASS[s]||'';return `<span class="src-badge ${cls}">${s}</span>`;}
+
+function buildLink(slug){
+  const src=(document.getElementById('global-src').value||'').trim();
+  const qs=src&&src!=='direct'?('?src='+encodeURIComponent(src)):'';
+  return location.origin+'/go/'+slug+qs;
+}
+
 function render(list){
+  const bySlugSource=(data&&data.attribution&&data.attribution.bySlugSource)||{};
   rows.innerHTML='';
   list.forEach(r=>{
+    const breakdown=bySlugSource[r.slug]||{};
+    const keys=Object.keys(breakdown).sort((a,b)=>breakdown[b]-breakdown[a]);
+    const top=keys[0];
+    const hasBreakdown=keys.length>0;
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td class="font-semibold text-cyan-300">${r.slug||'—'}</td>
@@ -151,15 +223,49 @@ function render(list){
       <td class="text-slate-400">${r.mission||'—'}</td>
       <td class="text-slate-400">${r.platform||'—'}</td>
       <td class="text-right display font-bold ${r.clickCount>0?'text-lime-400':'text-slate-500'}">${r.clickCount}</td>
+      <td>${srcBadge(top||r.lastSource)}</td>
       <td class="text-slate-500 text-xs">${fmtDate(r.lastClicked)}</td>
       <td><span class="pill ${r.approved?'pill-on':'pill-off'}">${r.approved?'approved':'pending'}</span></td>
       <td class="text-right whitespace-nowrap">
-        ${r.slug?`<button class="btn mr-1" data-act="copy" data-slug="${r.slug}" data-testid="copy-${r.slug}">Copy</button>`:''}
-        ${r.slug?`<button class="btn mr-1" data-act="qr" data-slug="${r.slug}" data-testid="qr-${r.slug}">QR</button>`:''}
-        ${r.affiliateLink?`<a class="btn" href="${r.affiliateLink}" target="_blank" rel="noopener">Open</a>`:''}
+        ${r.slug?`<button class="btn btn-sm mr-1" data-act="copy" data-slug="${r.slug}" data-testid="copy-${r.slug}">Copy</button>`:''}
+        ${r.slug?`<button class="btn btn-sm mr-1" data-act="qr" data-slug="${r.slug}" data-testid="qr-${r.slug}">QR</button>`:''}
+        ${r.affiliateLink?`<a class="btn btn-sm" href="${r.affiliateLink}" target="_blank" rel="noopener">Open</a>`:''}
       </td>`;
     rows.appendChild(tr);
+    if(hasBreakdown){
+      const drow=document.createElement('tr');
+      drow.innerHTML=`<td colspan="9" class="!py-0 !px-0">
+        <details class="row-detail">
+          <summary class="text-[10px] uppercase tracking-[0.3em] text-slate-500 px-4 py-2 hover:text-cyan-300">▸ ${keys.length} source${keys.length>1?'s':''}</summary>
+          <div class="px-4 pb-3 flex flex-wrap gap-2">
+            ${keys.map(k=>`<span class="src-badge ${SRC_CLASS[k]||''}">${k} · ${breakdown[k]}</span>`).join('')}
+          </div>
+        </details>
+      </td>`;
+      rows.appendChild(drow);
+    }
   });
+}
+
+function renderAttribution(){
+  const a=data&&data.attribution;
+  const st=document.getElementById('attr-status');
+  const bars=document.getElementById('attr-bars');
+  const empty=document.getElementById('attr-empty');
+  if(!a||!a.available){bars.innerHTML='';empty.classList.remove('hidden');st.textContent='click log: offline';return;}
+  empty.classList.add('hidden');
+  const entries=Object.entries(a.bySource).sort((x,y)=>y[1]-x[1]);
+  const total=entries.reduce((s,[,v])=>s+v,0)||1;
+  st.textContent=`${a.logsCount} logs · ${entries.length} channels`;
+  if(entries.length===0){bars.innerHTML='<div class="text-xs text-slate-500 italic">No logged clicks yet — append <span class="kbd">?src=ig</span> (or any channel) to any <span class="kbd">/go/&lt;slug&gt;</span> URL to start recording.</div>';return;}
+  bars.innerHTML=entries.map(([s,v])=>{
+    const pct=(v/total*100).toFixed(1);
+    return `<div class="flex items-center gap-3">
+      <div class="w-24 flex-shrink-0">${srcBadge(s)}</div>
+      <div class="flex-1 bar"><span style="width:${pct}%"></span></div>
+      <div class="w-24 text-right font-bold text-slate-200">${v} <span class="text-slate-500 text-xs">(${pct}%)</span></div>
+    </div>`;
+  }).join('');
 }
 
 function hydrate(){
@@ -170,11 +276,12 @@ function hydrate(){
   document.getElementById('k-clicks').textContent=data.totalClicks;
   document.getElementById('k-approved').textContent=data.records.filter(r=>r.approved).length;
   document.getElementById('k-top').textContent=(data.records[0]&&data.records[0].slug)||'—';
+  renderAttribution();
   render(list);
 }
 
 async function boot(pw){
-  try{data=await load(pw);gate.classList.add('hidden');dash.classList.remove('hidden');hydrate();}
+  try{data=await load(pw);gate.classList.add('hidden');dash.classList.remove('hidden');refreshSourceSelects();hydrate();}
   catch(e){
     if(e.message==='unauthorized'){document.getElementById('gate-err').classList.remove('hidden');sessionStorage.removeItem(PW_KEY);localStorage.removeItem(PW_KEY);gate.classList.remove('hidden');dash.classList.add('hidden');}
     else{toast('Failed to load: '+e.message);}
@@ -200,20 +307,38 @@ rows.addEventListener('click',(e)=>{
   const b=e.target.closest('button[data-act]');if(!b)return;
   const slug=b.dataset.slug;
   if(b.dataset.act==='copy'){
-    const url=location.origin+'/go/'+slug;
+    const url=buildLink(slug);
     navigator.clipboard.writeText(url).then(()=>toast('Copied '+url));
   }
   if(b.dataset.act==='qr'){
-    document.getElementById('qr-slug').textContent='/go/'+slug;
-    document.getElementById('qr-img').src='/api/qr?slug='+encodeURIComponent(slug);
-    document.getElementById('qr-dl').href='/api/qr?slug='+encodeURIComponent(slug);
-    document.getElementById('qr-dl').setAttribute('download',slug+'-qr.png');
-    const m=document.getElementById('qr-modal');m.classList.remove('hidden');m.style.display='flex';
+    openQr(slug);
   }
 });
+
+function openQr(slug){
+  const m=document.getElementById('qr-modal');
+  document.getElementById('qr-slug').textContent='/go/'+slug;
+  const select=document.getElementById('qr-src');
+  const initialSrc=document.getElementById('global-src').value;
+  select.value=initialSrc;
+  function refreshQr(){
+    const src=select.value;
+    const qs=src&&src!=='direct'?('?src='+encodeURIComponent(src)):'';
+    const img='/api/qr?slug='+encodeURIComponent(slug)+(src&&src!=='direct'?'&src='+encodeURIComponent(src):'');
+    document.getElementById('qr-img').src=img;
+    document.getElementById('qr-url').textContent=location.origin+'/go/'+slug+qs;
+    const dl=document.getElementById('qr-dl');
+    dl.href=img;
+    dl.setAttribute('download',slug+(src&&src!=='direct'?'-'+src:'')+'-qr.png');
+  }
+  select.onchange=refreshQr;
+  refreshQr();
+  m.classList.remove('hidden');m.style.display='flex';
+}
 document.getElementById('qr-close').addEventListener('click',()=>{const m=document.getElementById('qr-modal');m.classList.add('hidden');m.style.display='';});
 
 // auto-login
+refreshSourceSelects();
 const savedPw=localStorage.getItem(PW_KEY)||sessionStorage.getItem(PW_KEY);
 if(savedPw)boot(savedPw);
 </script>

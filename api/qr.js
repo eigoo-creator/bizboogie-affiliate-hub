@@ -1,5 +1,10 @@
-// GET /api/qr?slug=foo -> returns PNG QR of the absolute /go/:slug URL.
+// GET /api/qr?slug=foo&src=ig&c=spring-drop
+// Returns PNG QR code of the absolute /go/:slug?src=…&c=… URL (preserves attribution).
 const QRCode = require('qrcode');
+
+function esc(v) {
+  return encodeURIComponent(String(v).slice(0, 120));
+}
 
 module.exports = async (req, res) => {
   const slug = (req.query && req.query.slug ? String(req.query.slug) : '').trim();
@@ -8,10 +13,16 @@ module.exports = async (req, res) => {
     res.end('slug required');
     return;
   }
+  const src = (req.query && (req.query.src || '')).toString().trim();
+  const campaign = (req.query && (req.query.c || req.query.campaign || '')).toString().trim();
 
   const host = req.headers['x-forwarded-host'] || req.headers.host || 'bizboogie.com';
   const proto = req.headers['x-forwarded-proto'] || 'https';
-  const target = `${proto}://${host}/go/${encodeURIComponent(slug)}`;
+  const params = [];
+  if (src) params.push(`src=${esc(src)}`);
+  if (campaign) params.push(`c=${esc(campaign)}`);
+  const qs = params.length ? `?${params.join('&')}` : '';
+  const target = `${proto}://${host}/go/${encodeURIComponent(slug)}${qs}`;
 
   try {
     const buf = await QRCode.toBuffer(target, {
@@ -23,7 +34,8 @@ module.exports = async (req, res) => {
     res.writeHead(200, {
       'Content-Type': 'image/png',
       'Cache-Control': 'public, max-age=86400',
-      'Content-Disposition': `inline; filename="${slug}-qr.png"`,
+      'Content-Disposition': `inline; filename="${slug}${src ? '-' + src : ''}-qr.png"`,
+      'X-QR-Target': target,
     });
     res.end(buf);
   } catch (err) {
